@@ -95,7 +95,7 @@ class ReCaptcha extends InputWidget
 
         $view = $this->view;
         $view->registerJsFile(
-            self::JS_API_URL . '?hl=' . $this->getLanguageSuffix(),
+            self::JS_API_URL . '?render=explicit&onload=CaptchaCallback&hl=' . $this->getLanguageSuffix(),
             ['position' => $view::POS_HEAD, 'async' => true, 'defer' => true]
         );
 
@@ -173,9 +173,21 @@ class ReCaptcha extends InputWidget
             $jsExpCode = "var recaptchaExpiredCallback = function(){jQuery('#{$inputId}').val(''); {$this->jsExpiredCallback}();};";
         }
         $this->jsExpiredCallback = 'recaptchaExpiredCallback';
+        
+        $jsVerifyCode = " if (typeof verifyCode !== 'undefined') {
+                grecaptcha.reset(verifyCode);
+                CaptchaCallback();
+            }
+            var CaptchaCallback = function() {
+                verifyCode = grecaptcha.render($('.g-recaptcha')[0], {
+                  'sitekey' : '{$this->siteKey}'
+                });
+            }; ";
 
         $view->registerJs($jsCode, $view::POS_BEGIN);
         $view->registerJs($jsExpCode, $view::POS_BEGIN);
+        $view->registerJs($jsVerifyCode, $view::POS_BEGIN);
+        
         echo Html::input('hidden', $inputName, null, ['id' => $inputId]);
     }
 }
