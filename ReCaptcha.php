@@ -182,7 +182,8 @@ class ReCaptcha extends InputWidget
                 verifyCode = grecaptcha.render($('.g-recaptcha')[0], {
                   'sitekey' : '{$this->siteKey}'
                 });
-            }; ";
+            }; 
+        ";
 
         $view->registerJs($jsCode, $view::POS_BEGIN);
         $view->registerJs($jsExpCode, $view::POS_BEGIN);
